@@ -159,7 +159,9 @@ return [
     */
 
     'attributes' => [
-        "number"    => "No. Lambung Kapal"
+        "number"    => "No. Lambung Kapal",
+        "name"      => "Nama Anggota",
+        "grade"     => "Pangkat"
     ],
 
 ];

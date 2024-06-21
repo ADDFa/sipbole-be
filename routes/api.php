@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BoatController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -28,6 +29,14 @@ Route::middleware("jwt.verify")->group(function () {
             Route::post("boat", "store");
             Route::put("boat/{boat}", "update");
             Route::delete("boat/{boat}", "destroy");
+        });
+
+        Route::controller(UserController::class)->group(function () {
+            Route::get("user", "index");
+            Route::get("user/{user}", "show");
+            Route::post("user", "store");
+            Route::put("user/{user}", "update");
+            Route::delete("user/{user}", "destroy");
         });
     });
 });

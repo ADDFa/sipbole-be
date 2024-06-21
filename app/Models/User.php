@@ -15,4 +15,9 @@ class User extends Model
     {
         return $this->belongsTo(Credential::class);
     }
+
+    public function boat()
+    {
+        return $this->belongsTo(Boat::class);
+    }
 }
