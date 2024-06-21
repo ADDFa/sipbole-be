@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Response;
 use App\Models\Boat;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 class BoatController extends Controller
 {
@@ -14,17 +17,8 @@ class BoatController extends Controller
      */
     public function index()
     {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
+        $result = Boat::all();
+        return Response::result($result);
     }
 
     /**
@@ -35,7 +29,16 @@ class BoatController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validator = Validator::make($request->all(), [
+            "number"        => "required|unique:boats,number",
+            "information"   => "string|nullable"
+        ]);
+        if ($validator->fails()) return Response::errors($validator->errors());
+
+        $boat = new Boat($validator->validate());
+        $boat->save();
+
+        return Response::result($boat);
     }
 
     /**
@@ -46,18 +49,7 @@ class BoatController extends Controller
      */
     public function show(Boat $boat)
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Boat  $boat
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Boat $boat)
-    {
-        //
+        return Response::result($boat);
     }
 
     /**
@@ -69,7 +61,19 @@ class BoatController extends Controller
      */
     public function update(Request $request, Boat $boat)
     {
-        //
+        $validator = Validator::make($request->all(), [
+            "number"    => [
+                "required",
+                Rule::unique("boats")->ignore($boat->id)
+            ],
+            "information" => "string|nullable"
+        ]);
+        if ($validator->fails()) return Response::errors($validator->errors());
+
+        $boat->update($validator->validate());
+        $boat->save();
+
+        return Response::result($boat);
     }
 
     /**
@@ -80,6 +84,7 @@ class BoatController extends Controller
      */
     public function destroy(Boat $boat)
     {
-        //
+        $boat->delete();
+        return Response::result($boat);
     }
 }

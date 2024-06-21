@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BoatController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -20,7 +21,11 @@ Route::controller(AuthController::class)->group(function () {
 });
 
 Route::middleware("jwt.verify")->group(function () {
-    Route::get("/protected", function () {
-        return response()->json(["message" => "middleware success"]);
+    Route::controller(BoatController::class)->group(function () {
+        Route::get("boat", "index");
+        Route::get("boat/{boat}", "show");
+        Route::post("boat", "store");
+        Route::put("boat/{boat}", "update");
+        Route::delete("boat/{boat}", "destroy");
     });
 });
