@@ -10,4 +10,9 @@ class User extends Model
     use HasFactory;
 
     protected $guarded = ["id"];
+
+    public function credential()
+    {
+        return $this->belongsTo(Credential::class);
+    }
 }

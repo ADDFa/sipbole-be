@@ -20,7 +20,8 @@ class AuthenticateSeeder extends Seeder
             [
                 "credential"    => [
                     "username"  =>  "admin-sipbole",
-                    "password"  =>  password_hash("12345678", PASSWORD_DEFAULT)
+                    "password"  =>  password_hash("12345678", PASSWORD_DEFAULT),
+                    "role"      => "admin"
                 ],
                 "user"          => [
                     "name"      => "Komandan Tertinggi",

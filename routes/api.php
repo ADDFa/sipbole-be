@@ -21,11 +21,13 @@ Route::controller(AuthController::class)->group(function () {
 });
 
 Route::middleware("jwt.verify")->group(function () {
-    Route::controller(BoatController::class)->group(function () {
-        Route::get("boat", "index");
-        Route::get("boat/{boat}", "show");
-        Route::post("boat", "store");
-        Route::put("boat/{boat}", "update");
-        Route::delete("boat/{boat}", "destroy");
+    Route::middleware("admin")->group(function () {
+        Route::controller(BoatController::class)->group(function () {
+            Route::get("boat", "index");
+            Route::get("boat/{boat}", "show");
+            Route::post("boat", "store");
+            Route::put("boat/{boat}", "update");
+            Route::delete("boat/{boat}", "destroy");
+        });
     });
 });
