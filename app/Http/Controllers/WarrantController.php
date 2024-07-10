@@ -168,4 +168,11 @@ class WarrantController extends Controller
         $warrant->delete();
         return Response::result($warrant);
     }
+
+    public function letter()
+    {
+        // "https://si-pal.com/api/storage/letters/wBLrMW1XFI2x9lg8GfFKCpCzXPcbbBLQy9wsYw18.pdf"
+        $path = storage_path("app/public/letters/wBLrMW1XFI2x9lg8GfFKCpCzXPcbbBLQy9wsYw18.pdf");
+        return response()->file($path);
+    }
 }
