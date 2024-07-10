@@ -6,7 +6,7 @@
     <link rel="icon" type="image/png" href="/logo.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>SI_PAL</title>
-    <script type="module" crossorigin src="/assets/index-D6GCy_ov.js"></script>
+    <script type="module" crossorigin src="/assets/index-2BZ9a7Oq.js"></script>
     <link rel="stylesheet" crossorigin href="/assets/index-CfrBpK7z.css">
 </head>
 
