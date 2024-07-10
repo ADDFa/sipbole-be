@@ -81,7 +81,6 @@ Route::middleware("jwt.verify")->group(function () {
 
     Route::controller(WarrantController::class)->group(function () {
         Route::get("warrant", "index");
-        Route::get("letter", "letter");
     });
 
     Route::controller(WarrantsBoatController::class)->group(function () {
