@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Http\Response;
+use App\Models\User;
 use Closure;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
@@ -29,8 +30,7 @@ class VerifyJwtToken
             $algo = Config::get("jwt.algo");
 
             $payload = JWT::decode($token, new Key($secret, $algo));
-            $request->attributes->add(["user" => $payload->sub]);
-
+            $request->attributes->add(["user" => $payload->id, "role" => $payload->role, "auth_id"  => $payload->auth_id]);
             return $next($request);
         } catch (\Exception $e) {
             return Response::message("invalid token", 401);

@@ -9,6 +9,7 @@ use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
@@ -16,13 +17,14 @@ class AuthController extends Controller
     public function signIn(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            "username"  => "required|exists:credentials,username",
+            "username"  => "required|string",
             "password"  => "required|string"
         ]);
         if ($validator->fails()) return Response::errors($validator->errors());
 
         // get auth data
-        $auth = Credential::where("username", $request->username)->first();
+        $auth = Credential::where(DB::raw("BINARY `username`"), $request->username)->first();
+        if (!$auth) return Response::message("Username atau Password salah!");
 
         // check password
         $isCorrectPass = password_verify($request->password, $auth->password);
@@ -44,7 +46,7 @@ class AuthController extends Controller
             $refresh = Config::get("jwt.refresh");
             $algo = Config::get("jwt.algo");
             $payload = JWT::decode($request->token, new Key($refresh, $algo));
-            $user = User::find($payload->sub);
+            $user = User::find($payload->id);
             $credential = Credential::find($user->credential_id);
 
             return $this->generateToken($credential);
@@ -53,29 +55,32 @@ class AuthController extends Controller
         }
     }
 
-    private function generateToken(Credential $auth): array
+    public static function generateToken(Credential $auth): array
     {
         $secret = Config::get("jwt.secret");
         $refresh = Config::get("jwt.refresh");
         $algo = Config::get("jwt.algo");
+        $result = [];
 
         $time = time();
         $userId = User::where("credential_id", $auth->id)->value("id");
+
         $payload = [
-            "iss"   => "access-tokens", // issue
-            "sub"   => $userId, // subject
-            "iat"   => $time, // Time when JWT was issued
-            "exp"   => $time + Config::get("jwt.exp_access")
+            "role"      => $auth->role,
+            "id"        => $userId,
+            "auth_id"   => $auth->id,
+            "iat"       => $time // Time when JWT was issued
         ];
+        $result["payload"] = $payload;
+
+        $payload["exp"] = $time + Config::get("jwt.exp_access");
         $accessToken = JWT::encode($payload, $secret, $algo);
+        $result["access_token"] = $accessToken;
 
         $payload["exp"] = $time + Config::get("jwt.exp_refresh");
         $refreshToken = JWT::encode($payload, $refresh, $algo);
+        $result["refresh_token"] = $refreshToken;
 
-        return [
-            "access_token"  => $accessToken,
-            "refresh_token" => $refreshToken,
-            "payload"       => $payload
-        ];
+        return $result;
     }
 }

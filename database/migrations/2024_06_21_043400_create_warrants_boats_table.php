@@ -17,6 +17,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId("warrant_id")->constrained("warrants");
             $table->foreignId("boat_id")->constrained("boats");
+            $table->boolean("read")->default(false);
+            $table->timestamps();
         });
     }
 

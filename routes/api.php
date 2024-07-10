@@ -1,8 +1,16 @@
 <?php
 
+use App\Http\Controllers\ActivityController;
+use App\Http\Controllers\ActivityReportController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BoatController;
+use App\Http\Controllers\CredentialController;
+use App\Http\Controllers\InfoController;
+use App\Http\Controllers\ReportController;
+use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\WarrantController;
+use App\Http\Controllers\WarrantsBoatController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -23,6 +31,10 @@ Route::controller(AuthController::class)->group(function () {
 
 Route::middleware("jwt.verify")->group(function () {
     Route::middleware("admin")->group(function () {
+        Route::controller(InfoController::class)->group(function () {
+            Route::get("info", "index");
+        });
+
         Route::controller(BoatController::class)->group(function () {
             Route::get("boat", "index");
             Route::get("boat/{boat}", "show");
@@ -33,10 +45,57 @@ Route::middleware("jwt.verify")->group(function () {
 
         Route::controller(UserController::class)->group(function () {
             Route::get("user", "index");
-            Route::get("user/{user}", "show");
             Route::post("user", "store");
             Route::put("user/{user}", "update");
             Route::delete("user/{user}", "destroy");
         });
+
+        Route::controller(WarrantController::class)->group(function () {
+            Route::get("warrant/{warrant}", "show");
+            Route::post("warrant", "store");
+            Route::put("warrant/{warrant}", "update");
+            Route::delete("warrant/{warrant}", "destroy");
+        });
+
+        Route::controller(ActivityReportController::class)->group(function () {
+            Route::get("activity-report", "index");
+        });
+
+        Route::controller(ScheduleController::class)->group(function () {
+            Route::get("schedule/{schedule}", "show");
+            Route::post("schedule", "store");
+            Route::put("schedule/{schedule}", "update");
+            Route::delete("schedule/{schedule}", "destroy");
+        });
+    });
+
+    Route::controller(UserController::class)->group(function () {
+        Route::get("user/{user}", "show");
+        Route::put("update-profile/{user}", "updateProfile");
+        Route::put("update-profile-pic/{user}", "updateProfilePic");
+    });
+
+    Route::controller(CredentialController::class)->group(function () {
+        Route::put("update-password", "updatePassword");
+    });
+
+    Route::controller(WarrantController::class)->group(function () {
+        Route::get("warrant", "index");
+    });
+
+    Route::controller(WarrantsBoatController::class)->group(function () {
+        Route::patch("warrant-boat/{warrantsBoat}/read", "read");
+    });
+
+    Route::controller(ActivityController::class)->group(function () {
+        Route::get("activity", "index");
+    });
+
+    Route::controller(ReportController::class)->group(function () {
+        Route::post("report", "store");
+    });
+
+    Route::controller(ScheduleController::class)->group(function () {
+        Route::get("schedule", "index");
     });
 });

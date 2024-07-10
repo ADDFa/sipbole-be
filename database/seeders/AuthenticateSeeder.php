@@ -19,13 +19,14 @@ class AuthenticateSeeder extends Seeder
         $data = [
             [
                 "credential"    => [
-                    "username"  =>  "admin-sipbole",
-                    "password"  =>  password_hash("12345678", PASSWORD_DEFAULT),
+                    "username"  =>  "admin-si_pal",
+                    "password"  =>  password_hash("password", PASSWORD_DEFAULT),
                     "role"      => "admin"
                 ],
                 "user"          => [
-                    "name"      => "Komandan Tertinggi",
-                    "grade"     => "KT"
+                    "name"      => "Admin",
+                    "grade"     => "KT",
+                    "boat_id"   => 1
                 ]
             ]
         ];
@@ -35,7 +36,6 @@ class AuthenticateSeeder extends Seeder
             $auth->save();
 
             $user = new User($value["user"]);
-            $user->boat_id = 1;
             $user->credential_id = 1;
             $user->save();
         }

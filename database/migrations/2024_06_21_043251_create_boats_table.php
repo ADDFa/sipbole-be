@@ -17,7 +17,9 @@ return new class extends Migration
             $table->id();
             $table->string("number")->unique();
             $table->text("information")->nullable();
+            $table->string("picture")->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

@@ -18,7 +18,8 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             BoatSeeder::class,
-            AuthenticateSeeder::class
+            AuthenticateSeeder::class,
+            ActivitySeeder::class
         ]);
     }
 }

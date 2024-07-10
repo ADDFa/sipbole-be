@@ -3,7 +3,6 @@
 namespace App\Http\Middleware;
 
 use App\Http\Response;
-use App\Models\User;
 use Closure;
 use Illuminate\Http\Request;
 
@@ -18,10 +17,7 @@ class CheckIfAdmin
      */
     public function handle(Request $request, Closure $next)
     {
-        $subject = $request->get("user");
-        $user = User::with("credential")->find($subject);
-        $role = $user->credential->role;
-
+        $role = $request->get("role");
         return $role === "admin" ? $next($request) : Response::message("Anda tidak memiliki akses ke konten ini");
     }
 }

@@ -13,14 +13,10 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create("warrants", function (Blueprint $table) {
+        Schema::create("activities", function (Blueprint $table) {
             $table->id();
-            $table->enum("type", ["Harkamtibmas", "Kegiatan Unggulan"]);
-            $table->string("letter");
-            $table->string("letter_file_name");
-            $table->integer("number_of_personnel");
+            $table->string("activity")->unique();
             $table->timestamps();
-            $table->softDeletes();
         });
     }
 
@@ -31,6 +27,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists("warrants");
+        Schema::dropIfExists("activities");
     }
 };

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Response;
 use App\Models\Boat;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 
@@ -31,11 +32,18 @@ class BoatController extends Controller
     {
         $validator = Validator::make($request->all(), [
             "number"        => "required|unique:boats,number",
-            "information"   => "string|nullable"
+            "information"   => "string|nullable",
+            "picture"       => [
+                "required",
+                Rule::imageFile()->max(2048)
+            ]
         ]);
         if ($validator->fails()) return Response::errors($validator->errors());
 
-        $boat = new Boat($validator->validate());
+        $picture = $request->file("picture")->store("public/boats");
+
+        $boat = new Boat($validator->safe(["number", "information"]));
+        $boat->picture = Storage::url($picture);
         $boat->save();
 
         return Response::result($boat);
@@ -49,7 +57,8 @@ class BoatController extends Controller
      */
     public function show(Boat $boat)
     {
-        return Response::result($boat);
+        $result = Boat::with("users")->find($boat->id);
+        return Response::result($result);
     }
 
     /**
@@ -66,11 +75,18 @@ class BoatController extends Controller
                 "required",
                 Rule::unique("boats")->ignore($boat->id)
             ],
-            "information" => "string|nullable"
+            "information" => "string|nullable",
+            "picture"   => Rule::imageFile()->max(2048)
         ]);
         if ($validator->fails()) return Response::errors($validator->errors());
 
-        $boat->update($validator->validate());
+        $picture = $request->file("picture");
+        if ($picture) {
+            $this->removePicture($boat->picture);
+            $boat->picture = Storage::url($picture->store("public/boats"));
+        }
+
+        $boat->update($validator->safe(["number", "information"]));
         $boat->save();
 
         return Response::result($boat);
@@ -86,5 +102,15 @@ class BoatController extends Controller
     {
         $boat->delete();
         return Response::result($boat);
+    }
+
+    private function removePicture($fileName)
+    {
+        if ($fileName) {
+            $fileName = explode("/", $fileName);
+            $fileName = end($fileName);
+
+            Storage::delete("public/boats/{$fileName}");
+        }
     }
 }

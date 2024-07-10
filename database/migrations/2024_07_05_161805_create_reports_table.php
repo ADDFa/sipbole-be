@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Report;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -13,14 +14,15 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create("warrants", function (Blueprint $table) {
+        Schema::create("reports", function (Blueprint $table) {
             $table->id();
+            $table->foreignId("warrant_id")->constrained("warrants");
+            $table->foreignId("boat_id")->constrained("boats");
             $table->enum("type", ["Harkamtibmas", "Kegiatan Unggulan"]);
-            $table->string("letter");
-            $table->string("letter_file_name");
-            $table->integer("number_of_personnel");
+            $table->string("year");
+            $table->enum("month", Report::months());
+            $table->longText("report");
             $table->timestamps();
-            $table->softDeletes();
         });
     }
 
@@ -31,6 +33,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists("warrants");
+        Schema::dropIfExists("reports");
     }
 };

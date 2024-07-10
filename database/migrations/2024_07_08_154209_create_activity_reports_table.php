@@ -13,14 +13,11 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create("warrants", function (Blueprint $table) {
+        Schema::create("activity_reports", function (Blueprint $table) {
             $table->id();
-            $table->enum("type", ["Harkamtibmas", "Kegiatan Unggulan"]);
-            $table->string("letter");
-            $table->string("letter_file_name");
-            $table->integer("number_of_personnel");
+            $table->foreignId("activity_id")->constrained("activities")->cascadeOnDelete();
+            $table->foreignId("report_id")->constrained("reports")->cascadeOnDelete();
             $table->timestamps();
-            $table->softDeletes();
         });
     }
 
@@ -31,6 +28,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists("warrants");
+        Schema::dropIfExists("activity_reports");
     }
 };
