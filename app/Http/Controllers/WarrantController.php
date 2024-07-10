@@ -171,8 +171,17 @@ class WarrantController extends Controller
 
     public function letter()
     {
-        // "https://si-pal.com/api/storage/letters/wBLrMW1XFI2x9lg8GfFKCpCzXPcbbBLQy9wsYw18.pdf"
-        $path = storage_path("app/public/letters/wBLrMW1XFI2x9lg8GfFKCpCzXPcbbBLQy9wsYw18.pdf");
-        return response()->file($path);
+        $fileName = "wBLrMW1XFI2x9lg8GfFKCpCzXPcbbBLQy9wsYw18.pdf";
+        $path = storage_path("app/letters/" . $fileName);
+
+        $file = Storage::get('letters/' . $fileName);
+        $type = Storage::mimeType('letters/' . $fileName);
+
+        $headers = [
+            'Content-Type' => $type,
+            'Content-Disposition' => 'inline; filename="' . $fileName . '"'
+        ];
+
+        return response($file, 200, $headers);
     }
 }
