@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string("year");
             $table->enum("month", Report::months());
             $table->longText("report");
+            $table->string("execution_warrant");
             $table->timestamps();
         });
     }
