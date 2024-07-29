@@ -1,17 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/png" href="/logo.png" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>SI_PAL</title>
-    <script type="module" crossorigin src="/assets/index-D9KEvg8Z.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-Df7FWgBZ.css">
-</head>
-
-<body>
-    <div id="root"></div>
-</body>
-
+    <head>
+        <meta charset="UTF-8" />
+        <link rel="icon" type="image/png" href="/logo.png" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>SI_PAL</title>
+      <script type="module" crossorigin src="/assets/index-GvbqqRJk.js"></script>
+      <link rel="stylesheet" crossorigin href="/assets/index-BDlq7uLt.css">
+    </head>
+    <body>
+        <div id="root"></div>
+    </body>
 </html>
