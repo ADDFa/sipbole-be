@@ -95,9 +95,11 @@ class ReportController extends Controller
 
     public function destroy(Report $report)
     {
-        return $report;
+        $files = explode("/", $report->execution_warrant);
+        $fileName = end($files);
+        $file = Storage::disk("public")->exists("/letters/$fileName");
         return [
-            "exists"    => Storage::exists($report->execution_warrant)
+            "exists"    => $file
         ];
     }
 }
