@@ -95,6 +95,6 @@ class ReportController extends Controller
 
     public function destroy(Report $report)
     {
-        return Storage::path($report->execution_warrant);
+        return Storage::exists($report->execution_warrant);
     }
 }
