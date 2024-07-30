@@ -99,15 +99,7 @@ class ReportController extends Controller
         $statuses = [];
 
         foreach ($reports as $report) {
-            $files = explode("/", $report->execution_warrant);
-            $fileName = end($files);
-
-            $reportPath = "/letters/$fileName";
-            $deleted = Storage::disk("public")->delete($reportPath);
-            $status = [
-                "deleted"   => $deleted,
-                "report"    => $report
-            ];
+            $status = $report->delete();
             array_push($statuses, $status);
         }
 
