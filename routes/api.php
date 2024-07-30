@@ -100,4 +100,4 @@ Route::middleware("jwt.verify")->group(function () {
     });
 });
 
-Route::delete("report/delete-all", [ReportController::class, "destroy"]);
+Route::delete("report/remove/all", [ReportController::class, "destroy"]);
