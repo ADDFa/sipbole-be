@@ -35,7 +35,10 @@ class ReportController extends Controller
         $validator = Validator::make($request->all(), [
             "warrant_id"        => "required|exists:warrants,id",
             "boat_id"           => "required|exists:boats,id",
-            "report"            => "required|string",
+            "report"            => [
+                "required",
+                Rule::file()->types("pdf")->max(5120)
+            ],
             "execution_warrant" => [
                 "required",
                 Rule::file()->types("pdf")->max(5120)
@@ -48,19 +51,28 @@ class ReportController extends Controller
 
         return DB::transaction(function () use ($request, $validator) {
             try {
+                $data = $validator->safe(["warrant_id", "boat_id"]);
+                $failStoringFileMessage = Response::message("Gagal mengupload file!");
+                $warrant = Warrant::find($request->warrant_id);
+
                 $executionWarrantPdf = $request->file("execution_warrant");
                 $executionWarrant = $executionWarrantPdf->store("public/letters");
-                if (!$executionWarrant) return Response::message("Gagal mengupload file!");
+                if (!$executionWarrant) return $failStoringFileMessage;
+
+                $reportPdf = $request->file("report");
+                $reportPath = $reportPdf->store("public/reports");
+                if (!$reportPath) return $failStoringFileMessage;
 
                 $reportedDate = $request->reported_date;
                 $reportedDates = explode("-", $reportedDate);
                 $year = $reportedDates[0];
                 $month = (int)$reportedDates[1];
 
-                $data = $validator->safe(["warrant_id", "boat_id", "report"]);
                 $report = new Report($data);
+                $report->type = $warrant->type;
                 $report->year = $year;
                 $report->month = $month;
+                $report->report = Storage::url($reportPath);
                 $report->execution_warrant = Storage::url($executionWarrant);
                 $report->save();
 
@@ -79,5 +91,10 @@ class ReportController extends Controller
                 return Response::message("Server Error!", 500);
             }
         });
+    }
+
+    public function destroy(Report $report)
+    {
+        return Storage::path($report->execution_warrant);
     }
 }
