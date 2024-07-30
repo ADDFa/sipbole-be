@@ -67,11 +67,13 @@ class ReportController extends Controller
                 $reportedDates = explode("-", $reportedDate);
                 $year = $reportedDates[0];
                 $month = (int)$reportedDates[1];
+                $date = $reportedDates[2];
 
                 $report = new Report($data);
                 $report->type = $warrant->type;
                 $report->year = $year;
                 $report->month = $month;
+                $report->date = $date;
                 $report->report = Storage::url($reportPath);
                 $report->execution_warrant = Storage::url($executionWarrant);
                 $report->save();
@@ -91,18 +93,5 @@ class ReportController extends Controller
                 return Response::message("Server Error!", 500);
             }
         });
-    }
-
-    public function destroy()
-    {
-        $reports = Report::all();
-        $statuses = [];
-
-        foreach ($reports as $report) {
-            $status = $report->delete();
-            array_push($statuses, $status);
-        }
-
-        return $statuses;
     }
 }

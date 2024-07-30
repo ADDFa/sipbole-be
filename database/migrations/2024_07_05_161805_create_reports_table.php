@@ -21,6 +21,7 @@ return new class extends Migration
             $table->enum("type", ["Harkamtibmas", "Kegiatan Unggulan"]);
             $table->string("year");
             $table->enum("month", Report::months());
+            $table->string("date");
             $table->string("report");
             $table->string("execution_warrant");
             $table->timestamps();

@@ -99,5 +99,3 @@ Route::middleware("jwt.verify")->group(function () {
         Route::get("schedule", "index");
     });
 });
-
-Route::delete("report/remove/all", [ReportController::class, "destroy"]);
