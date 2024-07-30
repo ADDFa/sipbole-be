@@ -93,13 +93,24 @@ class ReportController extends Controller
         });
     }
 
-    public function destroy(Report $report)
+    public function destroy()
     {
-        $files = explode("/", $report->execution_warrant);
-        $fileName = end($files);
-        $file = Storage::disk("public")->exists("/letters/$fileName");
-        return [
-            "exists"    => $file
-        ];
+        $reports = Report::all();
+        $statuses = [];
+
+        foreach ($reports as $report) {
+            $files = explode("/", $report->execution_warrant);
+            $fileName = end($files);
+
+            $reportPath = "/letters/$fileName";
+            $deleted = Storage::disk("public")->delete($reportPath);
+            $status = [
+                "deleted"   => $deleted,
+                "report"    => $report
+            ];
+            array_push($statuses, $status);
+        }
+
+        return $statuses;
     }
 }
