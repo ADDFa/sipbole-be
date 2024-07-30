@@ -95,6 +95,7 @@ class ReportController extends Controller
 
     public function destroy(Report $report)
     {
+        return $report;
         return [
             "exists"    => Storage::exists($report->execution_warrant)
         ];
