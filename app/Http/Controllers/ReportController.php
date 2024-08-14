@@ -67,32 +67,40 @@ class ReportController extends Controller
             "warrant_id"        => "required|exists:warrants,id",
             "boat_id"           => "required|exists:boats,id",
             "report"            => [
-                "required",
                 Rule::file()->types("pdf")->max(5120)
             ],
+            "report_text"       => "string|nullable",
             "execution_warrant" => [
                 "required",
                 Rule::file()->types("pdf")->max(5120)
             ],
             "reported_date"     => "required|date_format:Y-m-d",
             "activities"        => "required|array",
-            "activities.*"      => "required|exists:activities,id"
+            "activities.*"      => "required|exists:activities,id",
+            "category"          => [
+                "required",
+                Rule::in(["file", "text"])
+            ]
         ]);
+
+        // cek laporan, tidak boleh kosong
+        $validator->after(function (\Illuminate\Validation\Validator $validator) use ($request) {
+            if (!$request->report && !$request->report_text) {
+                $validator->errors()->add("report", "Laporan harus diisi!");
+                $validator->errors()->add("report_text", "Laporan harus diisi!");
+            }
+        });
         if ($validator->fails()) return Response::errors($validator->errors());
 
         return DB::transaction(function () use ($request, $validator) {
             try {
-                $data = $validator->safe(["warrant_id", "boat_id"]);
+                $data = $validator->safe(["warrant_id", "boat_id", "category"]);
                 $failStoringFileMessage = Response::message("Gagal mengupload file!");
                 $warrant = Warrant::find($request->warrant_id);
 
                 $executionWarrantPdf = $request->file("execution_warrant");
                 $executionWarrant = $executionWarrantPdf->store("public/letters");
                 if (!$executionWarrant) return $failStoringFileMessage;
-
-                $reportPdf = $request->file("report");
-                $reportPath = $reportPdf->store("public/reports");
-                if (!$reportPath) return $failStoringFileMessage;
 
                 $reportedDate = $request->reported_date;
                 $reportedDates = explode("-", $reportedDate);
@@ -105,7 +113,15 @@ class ReportController extends Controller
                 $report->year = $year;
                 $report->month = $month;
                 $report->date = $date;
-                $report->report = Storage::url($reportPath);
+                if ($request->category === "file") {
+                    $reportPdf = $request->file("report");
+                    $reportPath = $reportPdf->store("public/reports");
+                    if (!$reportPath) return $failStoringFileMessage;
+                    $report->report = Storage::url($reportPath);
+                }
+                if ($request->category === "text") {
+                    $report->report_text = $request->report_text;
+                }
                 $report->execution_warrant = Storage::url($executionWarrant);
                 $report->save();
 
@@ -121,7 +137,7 @@ class ReportController extends Controller
                 return Response::result($report);
             } catch (\Exception $e) {
                 DB::rollBack();
-                return Response::message("Server Error!", 500);
+                return Response::message("Server Error!\n {$e->getMessage()}", 500);
             }
         });
     }

@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Activity;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class ActivitySeeder extends Seeder
 {
@@ -15,10 +16,11 @@ class ActivitySeeder extends Seeder
      */
     public function run()
     {
+        DB::statement("TRUNCATE TABLE activities");
+
         $data = [
             ["activity" => "PATROLI PERAIRAN"],
             ["activity" => "RIKSA KAPAL"],
-            ["activity" => "SAR/LAKA AIR"],
             ["activity" => "BINMAS PERAIRAN"]
         ];
 
