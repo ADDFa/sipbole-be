@@ -33,4 +33,9 @@ class Report extends Model
     {
         return $this->hasMany(ActivityReport::class);
     }
+
+    public function warrant()
+    {
+        return $this->belongsTo(Warrant::class);
+    }
 }
