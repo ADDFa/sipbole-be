@@ -38,4 +38,9 @@ class Report extends Model
     {
         return $this->belongsTo(Warrant::class);
     }
+
+    public function sarDocumentations()
+    {
+        return $this->hasMany(SarDocumentation::class);
+    }
 }

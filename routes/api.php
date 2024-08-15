@@ -93,6 +93,7 @@ Route::middleware("jwt.verify")->group(function () {
 
     Route::controller(ReportController::class)->group(function () {
         Route::get("report", "index");
+        Route::post("report-sar", "storeSar");
         Route::post("report", "store");
     });
 

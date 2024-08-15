@@ -16,8 +16,6 @@ class ActivitySeeder extends Seeder
      */
     public function run()
     {
-        DB::statement("TRUNCATE TABLE activities");
-
         $data = [
             ["activity" => "PATROLI PERAIRAN"],
             ["activity" => "RIKSA KAPAL"],
