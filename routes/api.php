@@ -59,6 +59,10 @@ Route::middleware("jwt.verify")->group(function () {
         Route::controller(ActivityReportController::class)->group(function () {
             Route::get("activity-report", "index");
         });
+
+        Route::controller(ReportController::class)->group(function () {
+            Route::post("report-sar", "storeSar");
+        });
     });
 
     Route::controller(UserController::class)->group(function () {
@@ -85,7 +89,6 @@ Route::middleware("jwt.verify")->group(function () {
 
     Route::controller(ReportController::class)->group(function () {
         Route::get("report", "index");
-        Route::post("report-sar", "storeSar");
         Route::post("report", "store");
     });
 });

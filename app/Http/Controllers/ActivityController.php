@@ -13,9 +13,9 @@ class ActivityController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $result = Activity::all();
+        $result = Activity::where("accesibility", $request->get("role"))->get();
         return Response::result($result);
     }
 
