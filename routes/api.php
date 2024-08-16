@@ -7,7 +7,6 @@ use App\Http\Controllers\BoatController;
 use App\Http\Controllers\CredentialController;
 use App\Http\Controllers\InfoController;
 use App\Http\Controllers\ReportController;
-use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WarrantController;
 use App\Http\Controllers\WarrantsBoatController;
@@ -60,13 +59,6 @@ Route::middleware("jwt.verify")->group(function () {
         Route::controller(ActivityReportController::class)->group(function () {
             Route::get("activity-report", "index");
         });
-
-        Route::controller(ScheduleController::class)->group(function () {
-            Route::get("schedule/{schedule}", "show");
-            Route::post("schedule", "store");
-            Route::put("schedule/{schedule}", "update");
-            Route::delete("schedule/{schedule}", "destroy");
-        });
     });
 
     Route::controller(UserController::class)->group(function () {
@@ -95,9 +87,5 @@ Route::middleware("jwt.verify")->group(function () {
         Route::get("report", "index");
         Route::post("report-sar", "storeSar");
         Route::post("report", "store");
-    });
-
-    Route::controller(ScheduleController::class)->group(function () {
-        Route::get("schedule", "index");
     });
 });
