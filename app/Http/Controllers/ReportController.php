@@ -25,8 +25,9 @@ class ReportController extends Controller
     public function index(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            "year"  => "string",
-            "month" => Rule::in(Report::months())
+            "year"      => "string",
+            "month"     => Rule::in(Report::months()),
+            "category"  => Rule::in(["sar"])
         ]);
         if ($validator->fails()) return Response::errors($validator->errors());
 
@@ -34,7 +35,7 @@ class ReportController extends Controller
         $reports = [];
 
         if ($credential->role === "admin") {
-            $reports = Report::orderBy("created_at", "desc");
+            $reports = Report::orderBy("date", "desc");
         }
 
         if ($credential->role === "user") {
@@ -43,6 +44,10 @@ class ReportController extends Controller
         }
 
         if ($reports) {
+            if ($credential->role === "admin" && $request->category === "sar") {
+                $reports = $reports->where("boat_id", null)->where("warrant_id", null);
+            }
+
             if ($request->year) {
                 $reports = $reports->where("year", $request->year);
             }
@@ -78,11 +83,7 @@ class ReportController extends Controller
             ],
             "reported_date"     => "required|date_format:Y-m-d",
             "activities"        => "required|array",
-            "activities.*"      => "required|exists:activities,id",
-            "category"          => [
-                "required",
-                Rule::in(["file", "text"])
-            ]
+            "activities.*"      => "required|exists:activities,id"
         ]);
 
         // cek laporan, tidak boleh kosong
@@ -96,7 +97,7 @@ class ReportController extends Controller
 
         return DB::transaction(function () use ($request, $validator) {
             try {
-                $data = $validator->safe(["warrant_id", "boat_id", "category"]);
+                $data = $validator->safe(["warrant_id", "boat_id"]);
                 $failStoringFileMessage = Response::message("Gagal mengupload file!");
                 $warrant = Warrant::find($request->warrant_id);
 
@@ -115,13 +116,14 @@ class ReportController extends Controller
                 $report->year = $year;
                 $report->month = $month;
                 $report->date = $date;
-                if ($request->category === "file") {
+                if ($request->hasFile("report")) {
                     $reportPdf = $request->file("report");
                     $reportPath = $reportPdf->store("public/reports");
                     if (!$reportPath) return $failStoringFileMessage;
+
+                    $report->category = "file";
                     $report->report = Storage::url($reportPath);
-                }
-                if ($request->category === "text") {
+                } else {
                     $report->report_text = $request->report_text;
                 }
                 $report->execution_warrant = Storage::url($executionWarrant);
@@ -147,7 +149,6 @@ class ReportController extends Controller
     public function storeSar(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            "boat_id"   => "required|exists:boats,id",
             "type"      => [
                 "required",
                 Rule::in(["Harkamtibmas", "Kegiatan Unggulan"])
@@ -158,10 +159,6 @@ class ReportController extends Controller
             "execution_warrant" => [
                 "required",
                 Rule::file()->types("pdf")->max(5120)
-            ],
-            "category"      => [
-                "required",
-                Rule::in(["file", "text"])
             ],
             "documentations"    => "required|array",
             "documentations.*"  => [
@@ -200,13 +197,14 @@ class ReportController extends Controller
                 $report->year = $year;
                 $report->month = $month;
                 $report->date = $date;
-                if ($request->category === "file") {
+                if ($request->hasFile("report")) {
                     $reportPdf = $request->file("report");
                     $reportPath = $reportPdf->store("public/reports");
                     if (!$reportPath) return $failStoringFileMessage;
+
+                    $report->category = "file";
                     $report->report = Storage::url($reportPath);
-                }
-                if ($request->category === "text") {
+                } else {
                     $report->report_text = $request->report_text;
                 }
                 $report->execution_warrant = Storage::url($executionWarrant);
