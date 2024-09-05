@@ -19,7 +19,8 @@ class DatabaseSeeder extends Seeder
         $this->call([
             BoatSeeder::class,
             AuthenticateSeeder::class,
-            ActivitySeeder::class
+            ActivitySeeder::class,
+            AccesibilityInActivitiesSeeder::class
         ]);
     }
 }

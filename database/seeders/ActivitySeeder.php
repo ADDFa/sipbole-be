@@ -19,7 +19,8 @@ class ActivitySeeder extends Seeder
         $data = [
             ["activity" => "PATROLI PERAIRAN"],
             ["activity" => "RIKSA KAPAL"],
-            ["activity" => "BINMAS PERAIRAN"]
+            ["activity" => "BINMAS PERAIRAN"],
+            ["activity" => "SAR/LAKA AIR"]
         ];
 
         foreach ($data as $value) {
