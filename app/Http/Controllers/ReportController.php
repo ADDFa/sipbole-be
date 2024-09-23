@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Response;
-use App\Http\Services\Fonnte;
+use App\Services\Fonnte;
 use App\Models\Activity;
 use App\Models\ActivityReport;
 use App\Models\Credential;
