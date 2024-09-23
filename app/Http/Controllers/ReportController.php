@@ -6,7 +6,6 @@ use App\Http\Response;
 use App\Services\Fonnte;
 use App\Models\Activity;
 use App\Models\ActivityReport;
-use App\Models\Boat;
 use App\Models\Credential;
 use App\Models\Report;
 use App\Models\SarDocumentation;
