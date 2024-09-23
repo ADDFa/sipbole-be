@@ -41,4 +41,9 @@ class Fonnte
         curl_exec($this->curl);
         return new FonnteResponse($this->curl);
     }
+
+    public function close()
+    {
+        curl_close($this->curl);
+    }
 }

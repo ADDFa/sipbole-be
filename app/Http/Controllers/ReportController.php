@@ -140,6 +140,7 @@ class ReportController extends Controller
 
                 $notification = new Fonnte("ntH-+Pc@F@fGvHi8Wcf1");
                 $notification->sendMessage("082374632340", "Tes");
+                $notification->close();
 
                 DB::commit();
                 return Response::result($report);
