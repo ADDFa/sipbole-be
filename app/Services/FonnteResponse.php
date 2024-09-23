@@ -13,11 +13,11 @@ class FonnteResponse
 
     public function status(): bool
     {
-        return curl_errno($this->curl) ? false : true;
+        return !curl_errno($this->curl);
     }
 
     public function errorMessage()
     {
-        return curl_errno($this->curl);
+        return curl_error($this->curl);
     }
 }

@@ -6,10 +6,13 @@ use App\Http\Response;
 use App\Services\Fonnte;
 use App\Models\Activity;
 use App\Models\ActivityReport;
+use App\Models\Boat;
 use App\Models\Credential;
 use App\Models\Report;
 use App\Models\SarDocumentation;
+use App\Models\User;
 use App\Models\Warrant;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -110,6 +113,7 @@ class ReportController extends Controller
                 $reportedDates = explode("-", $reportedDate);
                 $year = $reportedDates[0];
                 $month = (int)$reportedDates[1];
+                $monthName = Report::months()[$month - 1];
                 $date = $reportedDates[2];
 
                 $report = new Report($data);
@@ -138,8 +142,50 @@ class ReportController extends Controller
                     $activityReport->save();
                 }
 
+                $user = User::where("boat_id", $request->boat_id)->whereHas("credential", function (Builder $query) {
+                    $query->where("role", "user");
+                })->first();
+                $userGrade = $user->grade;
+                $userName = $user->name;
+
+                $getActivityStatus = function (string $name) use ($request): string {
+                    $result = null;
+
+                    foreach ($request->activities as $activityId) {
+                        $activity = Activity::find($activityId);
+                        if (strtolower($name) === strtolower($activity->activity)) $result = "✔️";
+                    }
+                    if (is_null($result)) $result = "❌";
+
+                    return $result;
+                };
+
+                $message = <<<MESSAGE
+                _______________________________
+                
+                📋 Laporan Kegiatan!
+                
+                Tanggal: {$date} {$monthName} {$year}
+                _______________________________
+
+
+                Berikut adalah laporan kegiatan yang telah dilaksanakan oleh unit Polisi Perairan:
+                    1. Patroli Perairan {$getActivityStatus("Patroli Perairan")}
+                    2. Riksa Kapal {$getActivityStatus("Riksa Kapal")}
+                    3. Binmas Perairan {$getActivityStatus("Binmas Perairan")}
+
+                _______________________________
+
+                Laporan ini disampaikan oleh:
+                {$userGrade} {$userName}
+
+                Terima kasih atas perhatian dan kerjasamanya. Salam hormat,
+                POLAIRUD
+                                
+                MESSAGE;
+
                 $notification = new Fonnte("ntH-+Pc@F@fGvHi8Wcf1");
-                $notification->sendMessage("082374632340", "Tes");
+                $notification->sendMessage("082374632340", $message);
                 $notification->close();
 
                 DB::commit();
