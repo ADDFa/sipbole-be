@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Response;
+use App\Http\Services\Fonnte;
 use App\Models\Activity;
 use App\Models\ActivityReport;
 use App\Models\Credential;
@@ -136,6 +137,9 @@ class ReportController extends Controller
                     ]);
                     $activityReport->save();
                 }
+
+                $notification = new Fonnte("ntH-+Pc@F@fGvHi8Wcf1");
+                $notification->sendMessage("082374632340", "Tes");
 
                 DB::commit();
                 return Response::result($report);
