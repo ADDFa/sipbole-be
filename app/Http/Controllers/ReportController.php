@@ -144,8 +144,8 @@ class ReportController extends Controller
                 $user = User::where("boat_id", $request->boat_id)->whereHas("credential", function (Builder $query) {
                     $query->where("role", "user");
                 })->first();
-                $userGrade = $user->grade;
-                $userName = $user->name;
+                $userGrade = strtoupper($user->grade);
+                $userName = ucfirst($user->name);
 
                 $getActivityStatus = function (string $name) use ($request): string {
                     $result = null;
