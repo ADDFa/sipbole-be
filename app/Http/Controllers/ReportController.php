@@ -20,6 +20,14 @@ use Illuminate\Validation\Rule;
 
 class ReportController extends Controller
 {
+    // private $receiver = "085218950778";
+    private $notification;
+
+    public function __construct()
+    {
+        $this->notification = new Fonnte("ntH-+Pc@F@fGvHi8Wcf1");
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -183,9 +191,8 @@ class ReportController extends Controller
                                 
                 MESSAGE;
 
-                $notification = new Fonnte("ntH-+Pc@F@fGvHi8Wcf1");
-                $notification->sendMessage("085218950778", $message);
-                $notification->close();
+                $this->notification->sendMessage("082374632340", $message);
+                $this->notification->close();
 
                 DB::commit();
                 return Response::result($report);
@@ -227,26 +234,33 @@ class ReportController extends Controller
 
         return DB::transaction(function () use ($validator, $request) {
             try {
+                // ambil data id untuk kegiatan SAR/LAKA AIR
                 $activityId = Activity::where("activity", "SAR/LAKA AIR")->value("id");
                 $data = $validator->safe(["type", "boat_id", "category"]);
                 $failStoringFileMessage = Response::message("Gagal mengupload file!");
 
                 if (!$activityId) return Response::message("Maaf, Aktifitas Sar/Laka Air sedang tidak tersedia!");
 
+                // simpan surat perintah pelaksanaan
                 $executionWarrantPdf = $request->file("execution_warrant");
                 $executionWarrant = $executionWarrantPdf->store("public/letters");
                 if (!$executionWarrant) return $failStoringFileMessage;
 
+                // parsing tanggal
                 $reportedDate = $request->reported_date;
                 $reportedDates = explode("-", $reportedDate);
                 $year = $reportedDates[0];
-                $month = (int)$reportedDates[1];
+                $month = (int) $reportedDates[1];
+                $monthName = Report::months()[$month - 1];
                 $date = $reportedDates[2];
 
+                // simpan data laporan
                 $report = new Report($data);
                 $report->year = $year;
                 $report->month = $month;
                 $report->date = $date;
+
+                // simpan file laporan pdf jika ada, jika tidak ada simpan laporan dalam bentuk teks
                 if ($request->hasFile("report")) {
                     $reportPdf = $request->file("report");
                     $reportPath = $reportPdf->store("public/reports");
@@ -260,12 +274,14 @@ class ReportController extends Controller
                 $report->execution_warrant = Storage::url($executionWarrant);
                 $report->save();
 
+                // update relasi aktivitas laporan yaitu id dari SAR/LAKA AIR yang diambil diawal
                 $activityReport = new ActivityReport([
                     "report_id"     => $report->id,
                     "activity_id"   => $activityId
                 ]);
                 $activityReport->save();
 
+                // upload gambar dokumentasi
                 $documentations = $request->file("documentations");
                 foreach ($documentations as $documentation) {
                     $documentationPath = $documentation->store("public/sar-documentations");
@@ -281,11 +297,56 @@ class ReportController extends Controller
                 }
                 DB::commit();
 
+                // setelah semuanya berhasil tersimpan, kirimkan notifikasi melalui pesan whatsapp
+                $message = <<<MESSAGE
+                _______________________________
+                
+                📋 Laporan SAR!
+                
+                _______________________________
+
+
+                Kegiatan SAR telah dilaporkan, pada {$date} {$monthName} {$year}
+
+                _______________________________
+
+                Terima kasih atas perhatian dan kerjasamanya. Salam hormat,
+                POLAIRUD
+                                
+                MESSAGE;
+
+                $this->notification->sendMessage("082374632340", $message);
+                $this->notification->close();
+
                 return Response::result($report);
             } catch (\Exception $e) {
                 DB::rollBack();
                 return Response::message("Server Error!", 500);
             }
         });
+    }
+
+    public function destroySar(Report $report)
+    {
+        // hapus file-file dokumentasi
+        $documentations = SarDocumentation::where("report_id", $report->id)->get();
+        foreach ($documentations as $documentation) {
+            $path = str_replace("storage", "public", $documentation->image_path);
+            Storage::delete($path);
+        }
+
+        // hapus surat perintah pelaksanaan
+        $executionWarrantPath = str_replace("storage", "public", $report->execution_warrant);
+        Storage::delete($executionWarrantPath);
+
+        // hapus file laporan jika ada
+        if ($report->report) {
+            $reportFilePath = str_replace("storage", "public", $report->report);
+            Storage::delete($reportFilePath);
+        }
+
+        // hapus laporan
+        $report->delete();
+        return Response::result($report);
     }
 }

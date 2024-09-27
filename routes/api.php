@@ -62,6 +62,7 @@ Route::middleware("jwt.verify")->group(function () {
 
         Route::controller(ReportController::class)->group(function () {
             Route::post("report-sar", "storeSar");
+            Route::delete("remove-sar/{report}", "destroySar");
         });
     });
 
