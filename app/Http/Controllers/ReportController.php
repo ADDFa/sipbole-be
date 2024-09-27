@@ -20,7 +20,7 @@ use Illuminate\Validation\Rule;
 
 class ReportController extends Controller
 {
-    // private $receiver = "085218950778";
+    private $receiver = "085218950778";
     private $notification;
 
     public function __construct()
@@ -191,7 +191,7 @@ class ReportController extends Controller
                                 
                 MESSAGE;
 
-                $this->notification->sendMessage("082374632340", $message);
+                $this->notification->sendMessage($this->receiver, $message);
                 $this->notification->close();
 
                 DB::commit();
@@ -315,7 +315,7 @@ class ReportController extends Controller
                                 
                 MESSAGE;
 
-                $this->notification->sendMessage("082374632340", $message);
+                $this->notification->sendMessage($this->receiver, $message);
                 $this->notification->close();
 
                 return Response::result($report);
